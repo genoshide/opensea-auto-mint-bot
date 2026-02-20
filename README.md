@@ -89,8 +89,8 @@ genoshide-minter/
 
 **2. Clone Repository**
 ```Bash
-git clone https://github.com/genoshide/opensea-drops-minting-bot.git
-cd opensea-drops-minting-bot
+git clone https://github.com/genoshide/opensea-auto-mint-bot.git
+cd opensea-auto-mint-bot
 ```
 **3. Setup Virtual Environment**
 **Windows (Git Bash):**
