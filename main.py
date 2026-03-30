@@ -70,7 +70,7 @@ async def orchestrator():
     await asyncio.gather(*tasks)
     Logger.log("SYS", "END", "All Operations Ceased.")
     
-    await asyncio.sleep(9999) 
+    await asyncio.sleep(99999) 
 
 if __name__ == "__main__":
     try:
