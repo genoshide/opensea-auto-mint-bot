@@ -11,7 +11,6 @@ from src.ui.logger import Logger
 from src.features.transfer import AssetRelay
 from src.ui.notifier import DiscordReporter
 from src.features.accountant import Accountant
-
 from src.utils.verifier import ContractVerifier, RuntimeDiagnostics
 from src.ui.dashboard import TUI 
 
