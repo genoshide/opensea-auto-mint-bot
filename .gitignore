@@ -51,6 +51,12 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# private keys, credentials, and other secrets
+private_key.txt
+credentials.json
+secrets.yaml
+proxies.txt
+
 # Translations
 *.mo
 *.pot
