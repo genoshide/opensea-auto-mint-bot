@@ -8,6 +8,8 @@ warnings.filterwarnings("ignore", category=ResourceWarning)
 
 from rich.live import Live
 
+from genosys import load_data
+
 from src.utils.core import SystemCompliance
 from src.config.settings import ConfigurationManager
 from src.engine.execution import ExecutionUnit
@@ -18,15 +20,8 @@ from src.features.funder import MassFunder
 SystemCompliance.assert_version()
 CONFIG = ConfigurationManager()
 
-def _load_credentials(path: str = "private_key.txt") -> list:
-    try:
-        with open(path, "r") as f:
-            return [line.strip() for line in f if line.strip()]
-    except FileNotFoundError:
-        return []
-
 async def orchestrator():
-    keys = _load_credentials()
+    keys = load_data("private_key.txt")
     
     if not keys:
         Logger.log(

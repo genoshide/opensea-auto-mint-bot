@@ -1,10 +1,7 @@
-import sys
 import os
-import asyncio
-import functools
-import logging
-from typing import Callable, Any
 from web3 import __version__ as web3_version
+from genosys.retry import async_retry
+
 
 class SystemCompliance:
     @staticmethod
@@ -16,19 +13,13 @@ class SystemCompliance:
     def cleanse_terminal():
         os.system("cls" if os.name == "nt" else "clear")
 
+
 def async_error_handler(retries: int = 3, delay: float = 1.0):
-    def decorator(func: Callable[..., Any]):
-        @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
-            attempt = 0
-            while attempt < retries:
-                try:
-                    return await func(*args, **kwargs)
-                except Exception as e:
-                    attempt += 1
-                    logging.error(f"[FaultGuard] {func.__name__} failed (Att {attempt}/{retries}): {str(e)[:50]}")
-                    if attempt >= retries:
-                        raise e
-                    await asyncio.sleep(delay)
-        return wrapper
-    return decorator
+    """Retry decorator — thin wrapper around genosys.async_retry with fixed delay."""
+    return async_retry(
+        max_attempts=retries,
+        base_delay=delay,
+        max_delay=delay,
+        exponential_base=1.0,
+        jitter=False,
+    )

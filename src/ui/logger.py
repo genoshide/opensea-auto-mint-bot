@@ -1,16 +1,10 @@
-import sys
 import re
 import logging
 from typing import Union, Any
+from genosys.log import setup_logging
 from src.ui.dashboard import TUI
 
-logging.basicConfig(
-    filename='bot_activity.log',
-    level=logging.INFO,
-    format='%(asctime)s | %(levelname)s | %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    filemode='a'
-)
+setup_logging(log_file="bot_activity.log", log_level="INFO")
 
 class TelemetryInterface:
     @staticmethod

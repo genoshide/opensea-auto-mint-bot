@@ -1,6 +1,7 @@
 import json
 import os
 from dotenv import load_dotenv
+from genosys import load_data
 
 load_dotenv()
 
@@ -56,10 +57,7 @@ class ConfigurationManager:
         self.use_proxies = raw_proxy_bool in ("true", "1", "yes", "on")
         self.proxies = []
         if self.use_proxies:
-            try:
-                with open("proxies.txt", "r") as f:
-                    self.proxies = [line.strip() for line in f if line.strip()]
-            except: pass
+            self.proxies = load_data("proxies.txt")
 
         self.mint_mode = os.getenv("MINT_MODE", "PROXY").upper()
         self.mint_func_name = os.getenv("MINT_FUNC_NAME", "mint")
