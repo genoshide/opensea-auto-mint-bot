@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
 import sys
+import subprocess
+
+def _ensure_pynosist():
+    try:
+        import pynosist
+    except ImportError:
+        print("[SYS] pynosist not found. Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pynosist", "-q"])
+        print("[SYS] pynosist installed. Continuing...")
+
+_ensure_pynosist()
+
 import asyncio
 import warnings
 
