@@ -9,6 +9,8 @@ class MassFunder:
         self.cfg = ConfigurationManager()
         
         net_info = NETWORKS.get(self.cfg.rpc_ticker)
+        if not net_info:
+            raise ValueError(f"Invalid Network Ticker: {self.cfg.rpc_ticker}")
         self.w3 = AsyncWeb3(AsyncHTTPProvider(net_info['rpc'][0]))
         self.symbol = net_info['symbol']
         

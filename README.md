@@ -3,9 +3,8 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white)
 ![Web3](https://img.shields.io/badge/Web3.py-7.12.0-orange?style=flat-square&logo=ethereum&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)
-![genosys](https://img.shields.io/badge/genosys-0.1.1-purple?style=flat-square)
 
-Fully automated NFT minting bot for OpenSea drops. Supports multi-wallet parallel execution, pre-signed transactions (God Mode), and automated asset management across 10 EVM networks.
+Automated NFT minting bot for OpenSea drops. Multi-wallet parallel execution, pre-signed transactions, and automated asset management across 10 EVM networks.
 
 ---
 
@@ -29,26 +28,16 @@ Fully automated NFT minting bot for OpenSea drops. Supports multi-wallet paralle
 
 ## Features
 
-**Execution**
-- **God Mode** — pre-signs raw transactions before mint opens, broadcasts at T-0 with 0ms CPU latency
-- **Universal ABI** — compatible with `mint`, `publicMint`, `purchase`, `claim` and any custom function
+- **God Mode** — pre-signs raw transactions before mint opens, broadcasts at T-0
+- **Universal ABI** — supports `mint`, `publicMint`, `purchase`, `claim`, and custom functions
 - **RPC Rotator** — auto-switches to backup nodes on failure or rate limit
-- **Gas Guardian** — pauses execution if live gas price exceeds your defined limit
-
-**Asset Management**
-- **Auto-Funder** — master wallet tops up worker wallets before mint if balance is insufficient
-- **Auto-Transfer** — sends minted NFTs to a cold wallet immediately after mint
-- **Dust Sweeper** — sweeps leftover ETH back to master wallet post-execution
-- **Accountant** — records every transaction, gas cost, and spend to `history.csv`
-
-**Security**
-- **Contract Verifier** — checks that the contract source is published on the block explorer before any transaction
-- **Proxy support** — rotate HTTP proxies per wallet
-
-**Monitoring**
-- Rich TUI dashboard — live per-wallet status, balances, and logs
-- Discord webhook alerts for mints and transfers
-- File logging via [genosys](https://pypi.org/project/genosys/)
+- **Gas Guardian** — pauses if live gas exceeds your defined limit
+- **Auto-Funder** — master wallet tops up workers before mint
+- **Auto-Transfer** — sends NFTs to cold wallet immediately after mint
+- **Dust Sweeper** — sweeps leftover ETH back to master wallet
+- **Accountant** — logs every transaction and gas cost to `history.csv`
+- **Contract Verifier** — checks source is published on block explorer before minting
+- **Proxy support** — per-wallet HTTP proxy rotation
 
 **Networks:** ETH · BASE · ARB · OP · POLY · BSC · AVAX · BERA · MONAD · ABSTRACT
 
@@ -60,8 +49,7 @@ Fully automated NFT minting bot for OpenSea drops. Supports multi-wallet paralle
 git clone https://github.com/genoshide/opensea-auto-mint-bot.git
 cd opensea-auto-mint-bot
 python -m venv venv
-source venv/Scripts/activate  # Windows
-# source venv/bin/activate    # Linux/Mac
+source venv/Scripts/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -69,16 +57,14 @@ pip install -r requirements.txt
 
 ## Configuration
 
-**1. Credentials**
+**Credentials**
 
 ```
 private_key.txt   — one worker private key per line
-proxies.txt       — one proxy per line: user:pass@ip:port (optional)
+proxies.txt       — one proxy per line: user:pass@ip:port  (optional)
 ```
 
-**2. Environment**
-
-Copy `.env.example` to `.env` and fill in your values:
+**Environment** — copy `.env.example` to `.env`:
 
 ```ini
 # Target
@@ -98,7 +84,7 @@ MAX_GAS_LIMIT="50"
 RETRY_DELAY_MIN="1.5"
 RETRY_DELAY_MAX="3.0"
 
-# God Mode (pre-signed transactions)
+# God Mode
 PRE_SIGN_ENABLED=false
 PRE_SIGN_GAS_MULTIPLIER="2.0"
 PRE_SIGN_GAS_LIMIT="300000"
@@ -119,16 +105,12 @@ MIN_ETH_TO_SWEEP="0.005"
 DISCORD_ENABLED=false
 DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
 
-# Optional modules
+# Optional
 ACCOUNTANT_ENABLED=false
 VERIFY_CONTRACT_ENABLED=false
 EXPLORER_API_KEY=""
 USE_PROXIES=false
 ```
-
-**3. Find the NFT contract address**
-
-Go to [opensea.io/drops](https://opensea.io/drops), open the drop page, and copy the contract address from the mint section.
 
 ---
 
@@ -138,41 +120,14 @@ Go to [opensea.io/drops](https://opensea.io/drops), open the drop page, and copy
 python main.py
 ```
 
-| File | Purpose |
-|---|---|
-| `bot_activity.log` | Detailed runtime logs |
-| `history.csv` | Transaction records (Accountant) |
+Output files: `bot_activity.log` (runtime logs) · `history.csv` (transaction records)
 
-Press `Ctrl+C` to stop gracefully.
-
----
-
-## Project Structure
-
-```
-opensea-auto-mint-bot/
-├── main.py
-├── requirements.txt
-├── .env.example
-├── private_key.txt       # gitignored
-├── proxies.txt           # gitignored
-└── src/
-    ├── config/           # Settings & ABIs
-    ├── engine/           # Execution core
-    ├── features/         # Funder, Transfer, Accountant
-    ├── ui/               # TUI dashboard, logger, notifier
-    └── utils/            # Verifier, helpers
-```
+Press `Ctrl+C` to stop.
 
 ---
 
 ## Disclaimer
 
-This software is provided for **educational and experimental purposes only**. Using this bot on mainnet involves real financial risk.
-
-By using this software you acknowledge that:
-- The author is not liable for any financial losses, failed transactions, or gas fees
-- The author is not liable if your wallet is flagged or restricted by any platform
-- You use this software entirely at your own risk
+For educational and experimental purposes only. Using this bot on mainnet involves real financial risk. The author is not liable for any losses, failed transactions, or gas fees. Use at your own risk.
 
 **Genoshide** © 2025 · MIT License

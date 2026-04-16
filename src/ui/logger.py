@@ -1,6 +1,6 @@
 import re
 import logging
-from typing import Union, Any
+from typing import Union
 from genosys.log import setup_logging
 from src.ui.dashboard import TUI
 

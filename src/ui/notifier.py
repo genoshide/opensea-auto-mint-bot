@@ -1,17 +1,19 @@
 import aiohttp
-import asyncio
 from datetime import datetime
 from src.config.settings import ConfigurationManager
 
 class DiscordReporter:
     @staticmethod
-    async def send_log(title: str, description: str, color: int, fields: list = []):
+    async def send_log(title: str, description: str, color: int, fields: list = None):
         cfg = ConfigurationManager()
         
         if not cfg.discord_enabled:
             return
         if not cfg.webhook_url:
             return
+
+        if fields is None:
+            fields = []
 
         embed = {
             "title": title,
@@ -54,6 +56,8 @@ class DiscordReporter:
             url = f"https://artio.beratrail.io/tx/{tx_hash}"
         elif network == "MONAD":
             url = f"https://testnet.monadexplorer.com/tx/{tx_hash}"
+        elif network == "ABSTRACT":
+            url = f"https://abscan.org/tx/{tx_hash}"
         else:
             url = f"https://etherscan.io/tx/{tx_hash}"
 

