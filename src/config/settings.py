@@ -1,7 +1,7 @@
 import json
 import os
 from dotenv import load_dotenv
-from genosys import load_data
+from chainutils import load_data
 
 load_dotenv()
 

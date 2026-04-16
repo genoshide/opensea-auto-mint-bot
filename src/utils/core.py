@@ -1,6 +1,6 @@
 import os
 from web3 import __version__ as web3_version
-from genosys.retry import async_retry
+from chainutils.retry import async_retry
 
 
 class SystemCompliance:
@@ -15,7 +15,7 @@ class SystemCompliance:
 
 
 def async_error_handler(retries: int = 3, delay: float = 1.0):
-    """Retry decorator — thin wrapper around genosys.async_retry with fixed delay."""
+    """Retry decorator — thin wrapper around chainutils.async_retry with fixed delay."""
     return async_retry(
         max_attempts=retries,
         base_delay=delay,

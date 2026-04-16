@@ -1,7 +1,6 @@
 web3==7.12.0
 eth-account>=0.8.0
-genosys>=0.1.2
+chainutils>=1.0.0
 python-dotenv
 aiohttp
-pynosist>=0.1.1
 rich
