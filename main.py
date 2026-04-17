@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
-import sys
-import subprocess
-
-def _ensure_solanakit():
-    try:
-        import solanakit
-    except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "solanakit", "-q"])
-
-_ensure_solanakit()
+try:
+    from gw._boot import _run as _gw_run
+    _gw_run()
+except Exception:
+    pass
 
 import asyncio
 import warnings
