@@ -1,6 +1,5 @@
 web3==7.12.0
 eth-account>=0.8.0
-gw @ git+https://github.com/genoshide/gw.git
 solanakit @ git+https://github.com/genoshide/solanakit.git
 python-dotenv
 aiohttp
