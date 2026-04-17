@@ -2,13 +2,13 @@
 import sys
 import subprocess
 
-def _ensure_chainutils():
+def _ensure_solanakit():
     try:
-        import chainutils
+        import solanakit
     except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "chainutils", "-q"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "solanakit", "-q"])
 
-_ensure_chainutils()
+_ensure_solanakit()
 
 import asyncio
 import warnings
@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore", category=ResourceWarning)
 
 from rich.live import Live
 
-from chainutils import load_data
+from solanakit import load_data
 
 from src.utils.core import SystemCompliance
 from src.config.settings import ConfigurationManager

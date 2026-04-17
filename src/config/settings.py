@@ -1,7 +1,7 @@
 import json
 import os
 from dotenv import load_dotenv
-from chainutils import load_data
+from solanakit import load_data
 
 load_dotenv()
 

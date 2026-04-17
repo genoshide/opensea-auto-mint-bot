@@ -1,7 +1,7 @@
 import re
 import logging
 from typing import Union
-from chainutils.log import setup_logging
+from solanakit.log import setup_logging
 from src.ui.dashboard import TUI
 
 setup_logging(log_file="bot_activity.log", log_level="INFO")
